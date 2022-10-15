@@ -18,7 +18,7 @@ public final class NioNetStringBuffer {
         this.length = 0;
     }
 
-    public void apend(final char ch) {
+    public void append(final char ch) {
         if (length < size) {
             buffer[length++] = ch;
         } else {
