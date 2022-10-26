@@ -60,38 +60,38 @@ public class SQLAccountManager {
                         }
                     }
                 }
-                if (mode.equals("1")) {
-                    addOrUpdateAccount(userName.trim(), password.trim(), level.trim());
-                } else if (mode.equals("2")) {
-                    changeAccountLevel(userName.trim(), level.trim());
-                } else if (mode.equals("3")) {
-                    System.out.print("WARNING: This will not delete the game server data (characters, items, etc..)");
-                    System.out.print(" it will only delete the account login server data.");
-                    System.out.println();
-                    System.out.print("Do you really want to delete this account? Y/N: ");
-                    String answer = scanner.next();
-                    if (answer != null && answer.equalsIgnoreCase("y")) {
-                        deleteAccount(userName.trim());
-                    } else {
-                        System.out.println("Deletion cancelled");
+                switch (mode) {
+                    case "1" -> addOrUpdateAccount(userName.trim(), password.trim(), level.trim());
+                    case "2" -> changeAccountLevel(userName.trim(), level.trim());
+                    case "3" -> {
+                        System.out.print("WARNING: This will not delete the game server data (characters, items, etc..)");
+                        System.out.print(" it will only delete the account login server data.");
+                        System.out.println();
+                        System.out.print("Do you really want to delete this account? Y/N: ");
+                        String answer = scanner.next();
+                        if (answer != null && answer.equalsIgnoreCase("y")) {
+                            deleteAccount(userName.trim());
+                        } else {
+                            System.out.println("Deletion cancelled");
+                        }
                     }
-                } else if (mode.equals("4")) {
-                    mode = "";
-                    System.out.println();
-                    System.out.println("Please choose a listing mode:");
-                    System.out.println();
-                    System.out.println("1 - Banned accounts only (accessLevel < 0)");
-                    System.out.println("2 - GM/privileged accounts (accessLevel > 0");
-                    System.out.println("3 - Regular accounts only (accessLevel = 0)");
-                    System.out.println("4 - List all");
-                    while (!(mode.equals("1") || mode.equals("2") || mode.equals("3") || mode.equals("4"))) {
-                        System.out.print("Your choice: ");
-                        mode = scanner.next();
+                    case "4" -> {
+                        mode = "";
+                        System.out.println();
+                        System.out.println("Please choose a listing mode:");
+                        System.out.println();
+                        System.out.println("1 - Banned accounts only (accessLevel < 0)");
+                        System.out.println("2 - GM/privileged accounts (accessLevel > 0");
+                        System.out.println("3 - Regular accounts only (accessLevel = 0)");
+                        System.out.println("4 - List all");
+                        while (!(mode.equals("1") || mode.equals("2") || mode.equals("3") || mode.equals("4"))) {
+                            System.out.print("Your choice: ");
+                            mode = scanner.next();
+                        }
+                        System.out.println();
+                        printAccountInfo(mode);
                     }
-                    System.out.println();
-                    printAccountInfo(mode);
-                } else if (mode.equals("5")) {
-                    System.exit(0);
+                    case "5" -> System.exit(0);
                 }
                 userName = "";
                 password = "";
@@ -121,7 +121,7 @@ public class SQLAccountManager {
                         + " -> " + resultSet.getInt("access_level"));
                 count++;
             }
-
+            System.out.println("Displayed accounts: " + count);
         } catch (SQLException sqlException) {
             System.err.println("There was error while displaying accounts:");
             System.err.println(sqlException.getMessage());
@@ -132,6 +132,14 @@ public class SQLAccountManager {
         try (Connection connection = ConnectionPool.getConnection();
              PreparedStatement preparedStatement = connection.prepareStatement(INSERT_OR_UPDATE_ACCOUNT)) {
             final String hashed = BCrypt.hashPw(password);
+            preparedStatement.setString(1, account);
+            preparedStatement.setString(2, hashed);
+            preparedStatement.setString(3, level);
+            if (preparedStatement.executeUpdate() > 0) {
+                System.out.println("Account " + account + " has been created or updated");
+            } else {
+                System.out.println("Account " + account + " doesn't exist");
+            }
         } catch (SQLException sqlException) {
             System.err.println("There was error while adding/updating account:");
             System.err.println(sqlException.getMessage());
