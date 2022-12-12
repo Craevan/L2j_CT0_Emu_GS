@@ -1430,7 +1430,7 @@ public class BCrypt {
      * @param lr  : An array containing the two 32-bit half blocks.
      * @param off : The position in the array of the blocks.
      */
-    private final void encipher(int[] lr, int off) {
+    private void encipher(int[] lr, int off) {
         int i;
         int n;
         int l = lr[off];
@@ -1457,7 +1457,7 @@ public class BCrypt {
     }
 
     /**
-     * Cycically extract a word of key material.
+     * Cyclically extract a word of key material.
      *
      * @param data : the string to extract the data from.
      * @param offp : A "pointer" (as a one-entry array) to the current offset into data.
@@ -1647,7 +1647,7 @@ public class BCrypt {
         char minor = (char) 0;
 
         int rounds;
-        int off = 0;
+        int off;
 
         StringBuilder rs = new StringBuilder();
 
@@ -1691,7 +1691,7 @@ public class BCrypt {
         if (rounds > 30)
             throw new IllegalArgumentException("rounds exceeds maximum (30)");
 
-        rs.append(Integer.toString(rounds));
+        rs.append(rounds);
         rs.append("$");
         rs.append(encodeBase64(saltb, saltb.length));
         rs.append(encodeBase64(hashed, BF_CRYPT_CIPHERTEXT.length * 4 - 1));
@@ -1719,7 +1719,7 @@ public class BCrypt {
         if (logRounds > 30)
             throw new IllegalArgumentException("log_rounds exceeds maximum (30)");
 
-        rs.append(Integer.toString(logRounds));
+        rs.append(logRounds);
         rs.append("$");
         rs.append(encodeBase64(rnd, rnd.length));
         return rs.toString();
