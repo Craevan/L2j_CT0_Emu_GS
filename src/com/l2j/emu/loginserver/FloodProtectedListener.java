@@ -38,7 +38,7 @@ public abstract class FloodProtectedListener extends Thread {
         }
     }
 
-    public abstract void addClients(Socket socket);
+    public abstract void addClient(Socket socket);
 
     @Override
     public void run() {
@@ -74,7 +74,7 @@ public abstract class FloodProtectedListener extends Thread {
                         flooders.put(address, new ForeignConnection(currentTime));
                     }
                 }
-                addClients(connection);
+                addClient(connection);
             } catch (IOException ioe) {
                 if (connection != null) {
                     try {
